@@ -133,43 +133,43 @@ Once connected, you'll see the TickTick MCP server tools available in Claude, in
 
 ## Available MCP Tools
 
-| Tool | Description | Parameters |
-|------|-------------|------------|
-| `get_projects` | List all your TickTick projects | None |
-| `get_project` | Get details about a specific project | `project_id` |
-| `get_project_tasks` | List all tasks in a project | `project_id` |
-| `get_task` | Get details about a specific task | `project_id`, `task_id` |
-| `create_task` | Create a new task | `title`, `project_id`, `content` (optional), `start_date` (optional), `due_date` (optional), `priority` (optional) |
-| `update_task` | Update an existing task | `task_id`, `project_id`, `title` (optional), `content` (optional), `start_date` (optional), `due_date` (optional), `priority` (optional) |
-| `complete_task` | Mark a task as complete | `project_id`, `task_id` |
-| `delete_task` | Delete a task | `project_id`, `task_id` |
-| `create_project` | Create a new project | `name`, `color` (optional), `view_mode` (optional) |
-| `delete_project` | Delete a project | `project_id` |
+| Tool                | Description                          | Parameters                                                                                                                               |
+| ------------------- | ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `get_projects`      | List all your TickTick projects      | None                                                                                                                                     |
+| `get_project`       | Get details about a specific project | `project_id`                                                                                                                             |
+| `get_project_tasks` | List all tasks in a project          | `project_id`                                                                                                                             |
+| `get_task`          | Get details about a specific task    | `project_id`, `task_id`                                                                                                                  |
+| `create_task`       | Create a new task                    | `title`, `project_id`, `content` (optional), `start_date` (optional), `due_date` (optional), `priority` (optional)                       |
+| `update_task`       | Update an existing task              | `task_id`, `project_id`, `title` (optional), `content` (optional), `start_date` (optional), `due_date` (optional), `priority` (optional) |
+| `complete_task`     | Mark a task as complete              | `project_id`, `task_id`                                                                                                                  |
+| `delete_task`       | Delete a task                        | `project_id`, `task_id`                                                                                                                  |
+| `create_project`    | Create a new project                 | `name`, `color` (optional), `view_mode` (optional)                                                                                       |
+| `delete_project`    | Delete a project                     | `project_id`                                                                                                                             |
 
 ## Task-specific MCP Tools
 
 ### Task Retrieval & Search
-| Tool | Description | Parameters |
-|------|-------------|------------|
-| `get_all_tasks` | Get all tasks from all projects | None |
-| `get_tasks_by_priority` | Get tasks filtered by priority level | `priority_id` (0: None, 1: Low, 3: Medium, 5: High) |
-| `search_tasks` | Search tasks by title, content, or subtasks | `search_term` |
+| Tool                    | Description                                 | Parameters                                          |
+| ----------------------- | ------------------------------------------- | --------------------------------------------------- |
+| `get_all_tasks`         | Get all tasks from all projects             | None                                                |
+| `get_tasks_by_priority` | Get tasks filtered by priority level        | `priority_id` (0: None, 1: Low, 3: Medium, 5: High) |
+| `search_tasks`          | Search tasks by title, content, or subtasks | `search_term`                                       |
 
 ### Date-Based Task Retrieval
-| Tool | Description | Parameters |
-|------|-------------|------------|
-| `get_tasks_due_today` | Get all tasks due today | None |
-| `get_tasks_due_tomorrow` | Get all tasks due tomorrow | None |
-| `get_tasks_due_in_days` | Get tasks due in exactly X days | `days` (0 = today, 1 = tomorrow, etc.) |
-| `get_tasks_due_this_week` | Get tasks due within the next 7 days | None |
-| `get_overdue_tasks` | Get all overdue tasks | None |
+| Tool                      | Description                          | Parameters                             |
+| ------------------------- | ------------------------------------ | -------------------------------------- |
+| `get_tasks_due_today`     | Get all tasks due today              | None                                   |
+| `get_tasks_due_tomorrow`  | Get all tasks due tomorrow           | None                                   |
+| `get_tasks_due_in_days`   | Get tasks due in exactly X days      | `days` (0 = today, 1 = tomorrow, etc.) |
+| `get_tasks_due_this_week` | Get tasks due within the next 7 days | None                                   |
+| `get_overdue_tasks`       | Get all overdue tasks                | None                                   |
 
 ### Getting Things Done (GTD) Framework
-| Tool | Description | Parameters |
-|------|-------------|------------|
-| `get_engaged_tasks` | Get "engaged" tasks (high priority or overdue) | None |
-| `get_next_tasks` | Get "next" tasks (medium priority or due tomorrow) | None |
-| `batch_create_tasks` | Create multiple tasks at once | `tasks` (list of task dictionaries) |
+| Tool                 | Description                                        | Parameters                          |
+| -------------------- | -------------------------------------------------- | ----------------------------------- |
+| `get_engaged_tasks`  | Get "engaged" tasks (high priority or overdue)     | None                                |
+| `get_next_tasks`     | Get "next" tasks (medium priority or due tomorrow) | None                                |
+| `batch_create_tasks` | Create multiple tasks at once                      | `tasks` (list of task dictionaries) |
 
 ## Example Prompts for Claude
 

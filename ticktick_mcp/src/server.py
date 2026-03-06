@@ -171,17 +171,47 @@ async def get_project_tasks(project_id: str) -> str:
             return "Failed to initialize TickTick client. Please check your API credentials."
     
     try:
+        # Get active tasks from the project data endpoint
         project_data = ticktick.get_project_with_data(project_id)
         if 'error' in project_data:
             return f"Error fetching project data: {project_data['error']}"
         
-        tasks = project_data.get('tasks', [])
-        if not tasks:
-            return f"No tasks found in project '{project_data.get('project', {}).get('name', project_id)}'."
+        active_tasks = project_data.get('tasks', [])
+        project_name = project_data.get('project', {}).get('name', project_id) if isinstance(project_data.get('project'), dict) else project_id
         
-        result = f"Found {len(tasks)} tasks in project '{project_data.get('project', {}).get('name', project_id)}':\n\n"
-        for i, task in enumerate(tasks, 1):
-            result += f"Task {i}:\n" + format_task(task) + "\n"
+        # Get completed tasks from the task endpoint
+        completed_response = ticktick.get_project_completed_tasks(project_id)
+        completed_tasks = []
+        
+        # Handle the response format (could be a list directly or wrapped in a dict)
+        if isinstance(completed_response, list):
+            completed_tasks = completed_response
+        elif isinstance(completed_response, dict) and 'tasks' in completed_response:
+            completed_tasks = completed_response.get('tasks', [])
+        elif isinstance(completed_response, dict) and not 'error' in completed_response:
+            # Try to extract tasks if they're in the dict
+            logger.info(f"Completed tasks response keys: {list(completed_response.keys()) if isinstance(completed_response, dict) else 'not a dict'}")
+        
+        # If no tasks found
+        total_tasks = len(active_tasks) + len(completed_tasks)
+        if total_tasks == 0:
+            return f"No tasks found in project '{project_name}'."
+        
+        result = f"Found {total_tasks} total tasks in project '{project_name}':\n\n"
+        
+        # Show active tasks
+        if active_tasks:
+            result += f"Active Tasks ({len(active_tasks)}):\n"
+            for i, task in enumerate(active_tasks, 1):
+                result += f"Task {i}:\n" + format_task(task) + "\n"
+        else:
+            result += "No active tasks.\n\n"
+        
+        # Show completed tasks
+        if completed_tasks:
+            result += f"\nCompleted Tasks ({len(completed_tasks)}):\n"
+            for i, task in enumerate(completed_tasks, 1):
+                result += f"Task {i}:\n" + format_task(task) + "\n"
         
         return result
     except Exception as e:
@@ -270,11 +300,11 @@ async def create_task(
 async def update_task(
     task_id: str,
     project_id: str,
-    title: str = None,
-    content: str = None,
-    start_date: str = None,
-    due_date: str = None,
-    priority: int = None
+    title: str | None= None,
+    content: str | None= None,
+    start_date: str | None= None,
+    due_date: str | None= None,
+    priority: int | None = None
 ) -> str:
     """
     Update an existing task in TickTick.

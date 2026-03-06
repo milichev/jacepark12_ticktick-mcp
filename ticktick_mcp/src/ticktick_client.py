@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 from dotenv import load_dotenv
 from typing import Dict, List, Any, Optional, Tuple
+from datetime import datetime, timedelta, timezone
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -191,7 +192,9 @@ class TickTickClient:
     
     def get_project_with_data(self, project_id: str) -> Dict:
         """Gets project with tasks and columns."""
-        return self._make_request("GET", f"/project/{project_id}/data")
+        result = self._make_request("GET", f"/project/{project_id}/data")
+        logger.info(f"API response for project {project_id}: {json.dumps(result, indent=2, default=str)}")
+        return result
     
     def create_project(self, name: str, color: str = "#F18181", view_mode: str = "list", kind: str = "TASK") -> Dict:
         """Creates a new project."""
@@ -306,3 +309,29 @@ class TickTickClient:
             data["priority"] = priority
             
         return self._make_request("POST", "/task", data)
+    
+    def get_project_completed_tasks(self, project_id: str) -> List[Dict]:
+        """
+        Gets completed tasks for a specific project.
+        Uses the proper /task/completed endpoint with a wide date range.
+        """
+        # Use a wide date range to capture all completed tasks
+        start_date = (datetime.now(timezone.utc) - timedelta(days=365)).strftime("%Y-%m-%dT%H:%M:%S.000+0000")
+        end_date = (datetime.now(timezone.utc) + timedelta(days=1)).strftime("%Y-%m-%dT%H:%M:%S.000+0000")
+        
+        data = {
+            "projectIds": [project_id],
+            "startDate": start_date,
+            "endDate": end_date
+        }
+        
+        result = self._make_request("POST", "/task/completed", data)
+        logger.info(f"Completed tasks response for project {project_id}: {json.dumps(result, indent=2, default=str)}")
+        
+        # Handle both list and dict responses
+        if isinstance(result, list):
+            return result
+        elif isinstance(result, dict) and "error" not in result:
+            return []
+        else:
+            return []
