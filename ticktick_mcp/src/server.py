@@ -159,12 +159,13 @@ async def get_project(project_id: str) -> str:
         return f"Error retrieving project: {str(e)}"
 
 @mcp.tool()
-async def get_project_tasks(project_id: str) -> str:
+async def get_project_tasks(project_id: str, include_completed: bool = False) -> str:
     """
     Get all tasks in a specific project.
     
     Args:
         project_id: ID of the project
+        include_completed: Whether to include completed tasks (default: False for backward compatibility)
     """
     if not ticktick:
         if not initialize_client():
@@ -179,7 +180,18 @@ async def get_project_tasks(project_id: str) -> str:
         active_tasks = project_data.get('tasks', [])
         project_name = project_data.get('project', {}).get('name', project_id) if isinstance(project_data.get('project'), dict) else project_id
         
-        # Get completed tasks from the task endpoint
+        # If completed tasks are not requested, return only active tasks
+        if not include_completed:
+            if not active_tasks:
+                return f"No active tasks found in project '{project_name}'."
+            
+            result = f"Found {len(active_tasks)} active task(s) in project '{project_name}':\n\n"
+            for i, task in enumerate(active_tasks, 1):
+                result += f"Task {i}:\n" + format_task(task) + "\n"
+            
+            return result
+        
+        # Get completed tasks from the task endpoint (only if requested)
         completed_response = ticktick.get_project_completed_tasks(project_id)
         completed_tasks = []
         
