@@ -3,7 +3,7 @@ import json
 import os
 import logging
 from datetime import datetime, timezone, date, timedelta
-from typing import Dict, List, Any, Optional
+from typing import cast, Dict, List, Any, Optional
 
 from mcp.server.fastmcp import FastMCP
 from dotenv import load_dotenv
@@ -257,10 +257,11 @@ async def get_task(project_id: str, task_id: str) -> str:
 async def create_task(
     title: str, 
     project_id: str, 
-    content: str = None, 
-    start_date: str = None, 
-    due_date: str = None, 
-    priority: int = 0
+    content: str = "", 
+    start_date: str = "", 
+    due_date: str = "", 
+    priority: int = 0,
+    is_all_day: bool = False
 ) -> str:
     """
     Create a new task in TickTick.
@@ -272,6 +273,7 @@ async def create_task(
         start_date: Start date in ISO format YYYY-MM-DDThh:mm:ss+0000 (optional)
         due_date: Due date in ISO format YYYY-MM-DDThh:mm:ss+0000 (optional)
         priority: Priority level (0: None, 1: Low, 3: Medium, 5: High) (optional)
+        is_all_day: Whether this is an all-day event (default: False). Set to True for date-only events to avoid timezone drift
     """
     if not ticktick:
         if not initialize_client():
@@ -297,7 +299,8 @@ async def create_task(
             content=content,
             start_date=start_date,
             due_date=due_date,
-            priority=priority
+            priority=priority,
+            is_all_day=is_all_day
         )
         
         if 'error' in task:
@@ -880,10 +883,11 @@ async def batch_create_tasks(tasks: List[Dict[str, Any]]) -> str:
                 # Extract task parameters with defaults
                 title = task_data['title']
                 project_id = task_data['project_id']
-                content = task_data.get('content')
-                start_date = task_data.get('start_date')
-                due_date = task_data.get('due_date')
+                content = cast(str, task_data.get('content'))
+                start_date = cast(str, task_data.get('start_date'))
+                due_date = cast(str, task_data.get('due_date'))
                 priority = task_data.get('priority', 0)
+                is_all_day = task_data.get('is_all_day', False)
                 
                 # Create the task
                 result = ticktick.create_task(
@@ -892,7 +896,8 @@ async def batch_create_tasks(tasks: List[Dict[str, Any]]) -> str:
                     content=content,
                     start_date=start_date,
                     due_date=due_date,
-                    priority=priority
+                    priority=priority,
+                    is_all_day=is_all_day
                 )
                 
                 if 'error' in result:
